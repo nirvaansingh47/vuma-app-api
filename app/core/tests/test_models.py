@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from core.models import VumaRequest
 
 
 def sample_user(email='test@gmail.com', password="testpassword"):
@@ -44,3 +45,14 @@ class ModelTests(TestCase):
 
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_vuma_requests_str(self):
+        """Test string representaiton of model"""
+        request = VumaRequest.objects.create(
+            name="Test request",
+            method="GET",
+            url="https://www.google.com",
+            user=sample_user()
+        )
+
+        self.assertEqual(str(request), request.name)

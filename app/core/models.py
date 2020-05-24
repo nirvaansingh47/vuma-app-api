@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
                                         PermissionsMixin
+from django.contrib.postgres.fields import JSONField
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -37,3 +39,35 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+METHODS = (
+    ('GET', 'GET'),
+    ('POST', 'POST'),
+    ('PUT', 'PUT'),
+    ('DELETE', 'DELETE'),
+    ('PATCH', 'PATCH')
+)
+
+
+class VumaRequest(models.Model):
+    """Model to store the users requests"""
+    name = models.CharField(max_length=255)
+    method = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        choices=METHODS
+    )
+    url = models.URLField(max_length=255)
+    body = JSONField(null=True)
+    header = JSONField(null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
